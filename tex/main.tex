@@ -1,0 +1,1494 @@
+\documentclass[11pt]{article}%[a4paper,10pt]
+  \usepackage{recipes}
+  \usepackage[colorlinks=true,
+                % linkcolor=blue!80!white,
+                % anchorcolor=blue!80!white,
+                % citecolor=blue!80!white,
+                % filecolor=blue!80!white,
+                % menucolor=blue!80!white,
+                % runcolor=blue!80!white,
+                % urlcolor=blue!80!white,
+                allcolors=blue!80!white
+                ]{hyperref}
+  % https://tex.stackexchange.com/questions/61015/how-to-use-different-colors-for-different-href-commands
+  \graphicspath{{images/}}
+
+\newcommand{\email}{billw@jajafinance.com}
+\newcommand{\company}{Jaja}
+
+
+%----------Title----------%
+
+\newcommand{\recipename}{VBA Guide}
+\newcommand{\recipecreator}{\href{mailto:\email}{William Wallis, \company}}
+\newcommand{\version}{Version 1.3}
+\newcommand{\versiondate}{\today}
+
+% \newcommand{mylink}[2]{\blue{\underline{\href{#1}{#2}}}}
+
+%--------------------BEGIN DOCUMENT----------------------%
+\begin{document}
+
+% \hrulefill
+\recipetitle
+
+\section*{Disclaimer}
+
+There may be typographic errors in this paper, which evolves continually. I may alter the contents at any time. If you find an error, please contact me at \href{mailto:\email}{\email} so I can correct it and save other people going through the same problems. There are no guarantees that the code in this paper will be suitable for what you want to do. After adapting an example to your code, please check that it performs in the way you want and returns sensible results.
+
+If you have a general VBA query, either regarding content in this paper or otherwise, please consult other sources of information.
+
+This resource is not endorsed by \company.
+
+\tableofcontents
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+
+This document is an introduction to some useful \textit{Visual Basic for Applications} (VBA) code that can be used to automate many processes, both business as usual and ad-hoc work. Once you start writing VBA yourself, a quick \href{https://www.google.co.uk/}{\Google} search is likely to provide you with a rich source of solutions to any problem that you have. Some experience using SAS will be useful, but not essential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SET UP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Set Up}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item Use \texttt{.xlsm} Workbooks.
+    \item Click \texttt{Alt + F11} for the code window.
+    \item Write VBA code inside Modules.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Workbooks and Modules}
+
+To save Workbooks with VBA code, you should use the \texttt{.xlsm} file extension which enables macros in the Workbook. You may also choose to save your Workbooks with the \texttt{.xls} or \texttt{.xlsb} extensions, but note that you should not save the Workbook with the usual \texttt{.xlsx} extension.
+
+To write VBA code, you need to open the code editor window. There are two ways to do this:
+
+\begin{enumerate}
+    \item Open the \textbf{Developer} tab of your Workbook, and then click \textbf{Visual Basic};
+    \item Press \texttt{Alt + F11}.
+\end{enumerate}
+
+If the Developer tab is not visible by default, then right-click on the ribbon (the row of tabs) and choose \textbf{Customize the \underline{R}ibbon...} which will open up a smaller window. On the right-hand-side of this window, tick the Developer box, and then click OK.
+
+Code should usually be written inside \textit{Modules}. To create a new Module, open the code window, click \textbf{\underline{I}nsert} in the top ribbon, and then click \textbf{\underline{M}odule}. To change the name of the Module, you need the \textbf{Properties Window} which can be opened by clicking \textbf{\underline{V}iew} and then \textbf{Properties \underline{W}indow}, or by clicking \texttt{F4}. The top box of this window contains the Module name, which can be changed there.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{MI Best Practice}
+
+For automating the main MI, it is best to write the code in a new Workbook to avoid making significant changes to the Workbooks that will be manipulated. It is generally considered bad practice to rely on the \texttt{Activate} and \texttt{Select} methods as they slow down code and are mostly unnecessary \cite{AvoidSelectActivate}, so working from an external Workbook will help enforce correct referencing (more on this in Section~\ref{sec:Referencing}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SUBROUTINES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Subroutines}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item Write code within subroutines.
+    \item VBA subroutines perform similarly to SAS macros.
+    \item Run subroutines with \texttt{F5}.
+    \item The comment character is the apostrophe (\texttt{'}).
+    \item Line breaks are important.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Subroutine Example}
+
+The majority of VBA code will be contained within \textit{subroutines}. A subroutine in VBA is just like a macro in SAS -- you are assigning a series of instructions to a name, and when you call the name the instructions are executed. Just like SAS macros, subroutines can also have arguments passed to them. The code below is an example of a simple subroutine that, when run, generates a message box with the text \textit{Hello World}.\\
+
+\begin{lstlisting}[style=A]
+    Sub PrintHelloWorld()
+
+        MsgBox "Hello World"
+
+    End Sub
+\end{lstlisting}
+
+Just like SAS macros have to start with \texttt{\%macro} and end with \texttt{\%mend}, VBA subroutines must start with \blue{\texttt{Sub}} and end with \blue{\texttt{End Sub}}. The subroutine name must also have the parentheses at the end (even if they are empty).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Running the Subroutine}\label{subsec:RunningTheSubroutine}
+
+There are three main ways to run a subroutine, two of which are from the code window itself.
+\begin{enumerate}
+    \item Inside the code window, pressing \texttt{F5} will do the following:
+    \begin{enumerate}
+        \item if the text cursor is on the same line as a subroutine, then that subroutine will be run;
+        \item else the list of available subroutines will be generated, and you can choose which to run.
+    \end{enumerate}
+    \item Inside the code window, pressing the Run Sub button (the play-looking button in the ribbon) will do the same as pressing \texttt{F5}.
+    \item In the Workbook, you can assign subroutines to buttons which run the subroutine when pressed (more on this in Section~\ref{subsec:AssigningAButton}).
+\end{enumerate}
+
+This means that you cannot run a selection of code inside a subroutine, for example. If you only want to run a portion of the code in your subroutine, one method is to comment the rest of it out -- the comment character in VBA is the apostrophe (\texttt{'}), which functions just like the asterisk (\(\ast\)) in SAS by commenting out the remainder of the line.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{If Statements}
+
+The syntax for an if-statement in VBA is very similar to the SAS syntax. The following example uses two useful built-in functions: \blue{\texttt{Time}}, which generates the current time, and \blue{\texttt{TimeValue}}, which converts a string (which should be in the \texttt{hh:mm:ss} format) into its corresponding VBA time numeric.\\
+
+\begin{lstlisting}[style=A]
+    Sub TimeSub()
+
+        If Time < TimeValue("12:00:00") Then
+            MsgBox "It is the morning."
+        ElseIf Time < TimeValue("17:00:00") Then
+            MsgBox "It is the afternoon."
+        Else
+            MsgBox "It is the evening."
+        End If
+
+    End Sub
+\end{lstlisting}
+
+It is important to note that an if-statement must finish with \blue{\texttt{End If}}, and the \blue{\texttt{ElseIf}} statements cannot have a space between the \blue{\texttt{Else}} and the \blue{\texttt{If}}. Similarly, the line breaks are important -- for example, the \blue{\texttt{ElseIf}} statement cannot be on the same line as the \blue{\texttt{If}} statement, nor can the \blue{\texttt{Else}} statement. The code following the \blue{\texttt{Then}} must also be on its own line. To illustrate this, consider the following code.\\
+
+\begin{lstlisting}[style=A]
+    Sub DoesNotWork()
+
+        If 1 = 2 Then MsgBox "Case 1"
+        ElseIf 1 = 1 Then MsgBox "Case 2"
+        Else MsgBox "Case 3"
+        End If
+
+    End Sub
+
+    Sub DoesWork()
+
+        If 1 = 2 Then
+        MsgBox "Case 1"
+        ElseIf 1 = 1 Then
+        MsgBox "Case 2"
+        Else
+        MsgBox "Case 3"
+        End If
+
+    End Sub
+\end{lstlisting}
+
+The first subroutine, \texttt{DoesNotWork}, will not work because the required line breaks are missing. The line breaks have been included in the second subroutine, \texttt{DoesWork}, so the code does work.\\
+
+It is possible to have a single-line if-statement. This type of if-statement cannot have any \blue{\texttt{ElseIf}} statements, and it does not need to end with \blue{\texttt{End If}}. The example below demonstrates this.\\
+
+\begin{lstlisting}[style=A]
+    Sub OneLineIfStatement()
+
+        If 1 = 2 Then MsgBox "TRUE" Else MsgBox "FALSE"
+
+    End Sub
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Calling Subroutines}
+
+It is usually convenient to call subroutines as part of another subroutine. This is achieved simply by writing the subroutine that you wish to call, and my preference is to indicate that the subroutine is being called by writing \blue{\texttt{Call}} before the subroutine. The example below is just to demonstrate how calling a subroutine works.\\
+
+\begin{lstlisting}[style=A]
+    Sub FirstSub()
+
+        MsgBox "This is the first subroutine"
+
+    End Sub
+
+    Sub SecondSub()
+
+        MsgBox "This is the second subroutine"
+
+    End Sub
+
+    Sub MasterSub()
+
+        Call FirstSub()
+        Call SecondSub()
+
+    End Sub
+\end{lstlisting}
+
+When \texttt{MasterSub} is run, it first generates a message box that says \textit{This is the first subroutine}, and then generates a second message box that says \textit{This is the second subroutine}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Private and Public Subroutines}
+
+You may see the words \textit{Private} or \textit{Public} before \blue{\texttt{Sub}}. These just control where the subroutine can be accessed from:
+\begin{enumerate}
+    \item \textit{Public} subroutines can be accessed/called from anywhere, such as other modules. Only public subroutines can be assigned to buttons in the Workbook.
+    \item \textit{Private} subroutines can only be accessed/called from within the module that they are written.
+\end{enumerate}
+
+A subroutine written without \blue{\texttt{Public}} or \blue{\texttt{Private}} at the start will be public by default.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Assigning a Button}\label{subsec:AssigningAButton}
+
+We mentioned in Section~\ref{subsec:RunningTheSubroutine} that it is possible to run a subroutine by assigning it to a button. Once a subroutine has been written, this is usually the easiest way to run it alongside the usual updating of a spreadsheet.
+
+To create a button, first click on the \textbf{Developer} tab of your Workbook, then click \textbf{Insert}, and then click the first (top-left) icon in the \textbf{Form Controls} section. The cursor will change to a plus symbol, and you can then draw the button onto the spreadsheet by clicking and dragging the cursor to fill the space that you want the button to occupy. When you release the mouse button, a window will appear with a list of the current \textit{public} subroutines, and you pick the subroutine that you want to assign from here.
+
+Once the subroutine is assigned, simply left-clicking the button will run the subroutine. To edit the button in any way, use right mouse clicks. To get the button to line up with the cells, hold \texttt{Alt} while creating, moving, or re-sizing the button.
+
+You can actually assign macros to a number of different objects in your Workbook, such as shapes (created within the \textbf{Insert} tab). This can help to make your `buttons' look a little more interesting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Enable Commenting Shortcut Keys}
+
+By default, there is no keyboard shortcut to comment out or uncomment sections of code. To enable this, we follow the instructions described in the first few answers of \cite{CommentUncommentCode}:
+
+\begin{enumerate}
+    \item Right-click on the toolbar, select \textbf{\underline{C}ustomize...}, and then select the \textbf{\underline{C}ommands} tab.
+    \item Under \textbf{Cate\underline{g}ories}, click on Edit and then select \textbf{Comment Block} in the \textbf{Comman\underline{d}s} listbox (roughly two thirds down).
+    \item Drag the \textbf{Comment Block} entry onto the menu bar (where the Run Sub button is). Note that you should now see a new icon on the menu bar.
+    \item With the Customize window still open, make sure that the new icon is highlighted (it will have a black square around it) and then click the \textbf{\underline{M}odify Selection} button in the \underline{C}ommands tab.
+    \item A dropdown box will appear. On the \textbf{\underline{N}ame} line, add an ampersand (\&) to the beginning of the entry so that instead of \textit{Comment Block} it should read \textit{\&Comment Block}. Press Enter to save the change.
+    \item Click on \textbf{\underline{M}odify Selection} again and select \textbf{Image \underline{a}nd Text}. Dismiss the Customize window.
+    \item Repeat the previous steps for \textit{Uncomment Block} instead of \textit{Comment Block}.
+\end{enumerate}
+
+You can now comment out code with \texttt{Alt + C} and uncomment with \texttt{Alt + U}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% VARIABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Variables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item It is good practice to always declare your variables (\blue{\texttt{Option Explicit}} forces this).
+    \item Declaring an object requires the \blue{\texttt{Set}} keyword.
+    \item Arguments in subroutines must have their data type defined as part of the argument.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Data Types and Objects}\label{subsec:DataTypesAndObjects}
+
+Since VBA is (more-or-less) an \textit{Object Oriented} programming language, it has variables that are class-based -- if you have not heard of this before, do not worry, as we will explain only the bits that you need to know. This means that it is good practice (and generally required) to write which classes your variables will come from at the start of your subroutines, so that Excel knows what kind of data your variable will be and how to use it. The \href{https://docs.microsoft.com/en-gb/dotnet/visual-basic/language-reference/data-types/index}{Data Type Summary} Microsoft Doc \cite{DataTypes} contains information on the default Visual Basic data types; it is likely that you will have come across many of these before.
+
+In addition to the data types in \cite{DataTypes}, there are also \textit{objects} (and \textit{collections}) that you would need to declare at the start of the code. Some common examples of data types and objects are given in Table~\ref{tab:DataTypesAndObjects}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}%{p{80pt}|p{80pt}}
+        \textbf{Data Types} & \textbf{Objects} \\\hline
+        String     & Workbook \\
+        Integer    & Worksheet \\
+        Date       & Range \\%\hline
+    \end{tabular}
+    \caption{Common Data Types and Objects}
+    \label{tab:DataTypesAndObjects}
+\end{table}
+
+At this point, a distinction is not really necessary -- you just need to remember that data types and objects need to be assigned values slightly differently (see the next section). Some of their other differences will become clear once you have worked with both a little more.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Declaring Variables}\label{subsec:DeclaringVariables}
+
+Declaring a variable has two steps: the first is to define what data type/object the variable will be, and the second is to assign the value/expression to the variable. The first step is achieved by using the \blue{\texttt{Dim}} keyword followed by the variable name, then an \blue{\texttt{as}} keyword, and then the data type/object.
+
+If the variable is a simple data type, you can assign its value by writing the variable (on a new line), then the equals key (\texttt{=}), and then the value you wish to assign to it. If the variable is an object, you also need to include the \blue{\texttt{Set}} keyword before the variable name.
+
+Suppose that we have a Workbook open called \texttt{Example Book.xlsm} with one Worksheet called \texttt{Example Sheet}. The example below shows how to declare a few objects (a Workbook, a Worksheet, a Range) and a few data types (a date, a string, an integer).\\
+
+\begin{lstlisting}[style=A]
+    Sub DeclareVariables()
+
+        Dim mainBook as Workbook
+        Dim mainSheet as Worksheet
+        Dim mainRange as Range
+
+        Dim today as Date
+        Dim myName as String
+        Dim myAge as Integer
+
+        Set mainBook = Workbooks("Example Book.xlsm")
+        Set mainSheet = Worksheets("Example Sheet")
+        Set mainRange = Range("A1:B2")
+
+        today = #03/14/2019# '  VBA uses American date formats -- this is 14th of March, 2019
+        myName = "Bill"
+        myAge = 23
+
+    End Sub
+\end{lstlisting}
+
+You will notice the extra syntax for the objects, the date, and the string. For the simple data types:
+\begin{enumerate}
+    \item manual dates must be in the \texttt{mm/dd/yy} format and enclosed in hashes (\texttt{\#});
+    \item strings must be enclosed in quotation marks (\texttt{"}).
+\end{enumerate}
+The objects themselves are defined using the functions \texttt{Workbooks}, \texttt{Worksheets}, and \texttt{Range} with the corresponding object's name as a string given to the functions as an argument. It is important for you to remember to use these functions whenever you want to use any of the above objects (we will see an alternative to the \texttt{Range} function in Section~\ref{subsec:RangeVsCells}).
+
+It is also worth noting that you may use the \texttt{Sheets} function instead of \texttt{Worksheets}: the former allows manipulation of \textit{Chart Sheets}, \textit{Dialog Sheets}, and \textit{Macro Sheets}, in addition to the usual \textit{Worksheets} that we are familiar with. See \cite{xlSheetTypes} for more details on these sheet types.
+
+To enforce declaration of variables, including \blue{\texttt{Option Explicit}} at the top of your module will trigger an error any time you try to use a variable that has not been declared.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{For Loops}
+
+In addition to if-statements, it is useful to know how to write a for-loop. The syntax for this is very simple, and is similar to the syntax for many other languages. We start by declaring the loop variable, which is \texttt{i} in the example below, and then write \texttt{\blue{For} i = m \blue{To} n} with \texttt{m} and \texttt{n} replaced by your lower and upper bounds for the iterations, respectively. These numbers must be whole numbers, and the loop will increment by 1 each time. On a new line, write the code to be looped over, and then finish with \texttt{\blue{Next} i}. In the example below, we print the iteration number in a message box for each integer starting at \texttt{1} and ending at \texttt{5}:\\
+
+\begin{lstlisting}[style=A]
+    Sub ForLoop()
+
+        Dim i As Integer
+        For i = 1 To 5
+            Debug.Print "This is iteration number " & i
+        Next i
+
+    End Sub
+\end{lstlisting}
+
+The example above also shows how to combine strings and variables in the message box by using the ampersand (\texttt{\&}). The spacing either side of the ampersand is important -- without it, your code may not perform as intended.
+
+The for-loops do not always need to enumerate through integers. It is possible to also enumerate all of (or a subset of) the items in a collection, say all of the Worksheets in a Workbook. The next example enumerates through each of the cells in a Range (remember, a single cell is still a \texttt{Range} object).\\
+
+\begin{lstlisting}[style=A]
+    Sub ObjectForLoop()
+
+        Dim iCell As Range
+        For iCell in Range("A1:D4")
+            Debug.Print iCell.Address
+        Next iCell
+
+    End Sub
+\end{lstlisting}
+
+The \texttt{Debug.Print} function prints output to the \textit{Immediate Window} instead of to a message box. You can open the Immediate Window with the keyboard shortcut \textbf{Ctrl} + \textbf{G}, or by using the \textbf{\underline{V}iew} tab.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Arguments in Subroutines}
+
+Just like with SAS macros, it is possible to pass arguments to subroutines that have this functionality set up. The names of the arguments must be declared within the parentheses after the subroutine name, rather than in the body of the subroutine. Consider the example subroutine below that adds \(1\) to the argument passed to it.\\
+
+\begin{lstlisting}[style=A]
+    Sub PlusOne(variable as Long)
+
+        Dim varPlusOne as Long
+
+        varPlusOne = variable + 1
+        MsgBox "One plus " & variable & " is " & varPlusOne
+
+    End Sub
+\end{lstlisting}
+
+In this subroutine, the argument, namely \texttt{variable}, is named and assigned the \blue{\texttt{Long}} data type within the parentheses after the subroutine name. The variable \texttt{varPlusOne} is a variable that is defined within the subroutine, so we declare its type inside the subroutine too.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Scope}
+
+Just like with SAS macros, the variables defined within a subroutine are contained within that subroutine. The example below defines the variable \texttt{newVar} within the first subroutine, and then attempts to display the variable in a message box in the second and third subroutines. \\
+
+\begin{lstlisting}[style=A]
+    Sub FirstSub()
+
+        Dim newVar As String
+        newVar = "In FirstSub"
+
+    End Sub
+
+    Sub SecondSub()
+
+        MsgBox newVar
+
+    End Sub
+
+    Sub ThirdSub()
+
+        Call FirstSub()
+        MsgBox newVar
+
+    End Sub
+\end{lstlisting}
+
+Since \texttt{newVar} is not defined within \texttt{SecondSub}, an error is generated when we try to use the variable in the \blue{\texttt{MsgBox}} function. The third subroutine is a more interesting case -- even though the subroutine \texttt{ThirdSub} calls the first subroutine \texttt{FirstSub} in which \texttt{newVar} is defined, the \blue{\texttt{MsgBox}} function \textit{still} generates an error when we try to use \texttt{newVar}.
+
+It is possible to define a variable so that it can be accessed in different subroutines. This is one of the cases where we write code \textit{outside} the subroutines. To define the variable, we write \blue{\texttt{Public}} instead of \blue{\texttt{Dim}} to declare the variable type while outside of a subroutine. Note that the value must still be assigned inside a subroutine, and that subroutine must be run to assign the value. In the example below, we declare the variable \texttt{pubVar} outside of the subroutines, give the variable the value in the \texttt{AssignVariable} subroutine, and then print the variable in the \texttt{PrintVariable} subroutine.\\
+
+\begin{lstlisting}[style=A]
+    Public pubVar As String
+
+    Sub AssignVariable()
+
+        pubVar = "In AssignVariable"
+
+    End Sub
+
+    Sub PrintVariable()
+
+        MsgBox pubVar
+
+    End Sub
+\end{lstlisting}
+
+If the public variable will be a constant simple data type, we can assign its value at the same time that we declare it. The example below shows how the example above can be altered to do this -- note how the \blue{\texttt{Public}} keyword has changed to \blue{\texttt{Const}}.\\
+
+\begin{lstlisting}[style=A]
+    Const pubVar As String = "Constant Variable"
+
+    Sub PrintVariable()
+
+        MsgBox pubVar
+
+    End Sub
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% REFERENCING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Referencing}\label{sec:Referencing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item Avoid using \texttt{Activate} and \texttt{Select}.
+    \item Use \blue{\texttt{With: End With}} to avoid unnecessary repetition.
+    \item Combine the \texttt{Range} function with the \texttt{Cells} function for dynamic selection of Ranges.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Explicit Referencing}
+
+It is common to see many \texttt{Activate} and \texttt{Select} statements in VBA code, despite the delays they add to the code. Using explicit references is a method around this.
+
+When referring to a Worksheet, a Range, or a Cell, there is the potential for ambiguity if you do not reference properly. Consider a Workbook with two sheets in it, say \texttt{Sheet1} and \texttt{Sheet2}. Suppose that we write the following subroutine.\\
+
+\begin{lstlisting}[style=A]
+    Sub ChangeCell()
+
+        Range("A1").Value = 1
+
+    End Sub
+\end{lstlisting}
+
+The subroutine changes the value in cell \texttt{A1} to 1. However, \textit{which} \texttt{A1} cell is changed -- the one in \texttt{Sheet1} or the one in \texttt{Sheet2}? By default, Excel will use the last Active sheet (you can make a sheet the active sheet by clicking on it, for example). Thus, it is better to explicitly state the Worksheet in the reference of the cell. The subroutine below uses explicit referencing to change the value of cell \texttt{A1} in \texttt{Sheet1} to 10, and the value of \texttt{A1} in \texttt{Sheet2} to 20.\\
+
+\begin{lstlisting}[style=A]
+    Sub ChangeCells()
+
+        Worksheets("Sheet1").Range("A1").Value = 10
+        Worksheets("Sheet2").Range("A1").Value = 20
+
+    End Sub
+\end{lstlisting}
+
+In fact, as the same Worksheet name might appear in multiple different Workbooks, it is also better the explicitly state the Workbook in the reference of the cell. Assuming that the Workbook is called \textit{Book1.xlsm}, the code can be improved by writing the new subroutine below.\\
+
+\begin{lstlisting}[style=A]
+    Sub ChangeCells()
+
+        Workbooks("Book1.xlsm").Worksheets("Sheet1").Range("A1").Value = 10
+        Workbooks("Book1.xlsm").Worksheets("Sheet2").Range("A1").Value = 20
+
+    End Sub
+\end{lstlisting}
+
+Since Excel will not allow you to open multiple Workbooks with the same name, this is as precise as we need to be when using references.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{With:~End With}
+
+Explicit references can take up a great deal of space on the line, and have the potential to get messy. The \blue{\texttt{With:~End With}} statement allows us to write part of the explicit reference once, with everything else contained within the \blue{\texttt{With:~End With}} statement understood to start with this reference. Consider the example below.\\
+
+\begin{lstlisting}[style=A]
+    Sub NotUsingWith()
+
+        Workbooks("Book1.xlsm").Worksheets("Sheet1").Range("A1").Value = 10
+        Workbooks("Book1.xlsm").Worksheets("Sheet1").Range("B2").Value = 20
+        Workbooks("Book1.xlsm").Worksheets("Sheet1").Range("C3").Value = 30
+
+    End Sub
+
+    Sub UsingWith()
+
+        With Workbooks("Book1.xlsm").Worksheets("Sheet1")
+            .Range("A1").Value = 10
+            .Range("B2").Value = 20
+            .Range("C3").Value = 30
+        End With
+
+    End Sub
+\end{lstlisting}
+
+Both of the subroutines above produce identical results, but the first subroutine is unnecessarily repeating the first part of the reference. By using \blue{\texttt{With: End With}}, we only need to write that part of the reference once. It is important to use the full-stop before the \texttt{Range} function -- without it, the reference after the \blue{\texttt{With}} \textbf{will not} be used.
+
+It is also worth noting that VBA works nicely with nested \blue{\texttt{With:~End With}} statements. For example, consider the example below.\\
+
+\begin{lstlisting}[style=A]
+    Sub UsingWithEndWith()
+
+        With Workbooks("Book1.xlsm").Worksheets("Sheet1")
+
+            With .Range("A1")
+                .Value = "Proportion"
+                .HorizontalAlignment = xlCenter
+                .NumberFormat = "@"
+            End With
+
+            With .Range("A2")
+                .Value = 0.01
+                .HorizontalAlignment = xlLeft
+                .NumberFormat = "0.00%"
+            End With
+
+        End With
+
+    End Sub
+\end{lstlisting}
+
+This example changes the value of Cell \texttt{A1} to the string \mauve{\texttt{'\(\!\!\)'Proportion'\(\!\!\)'}}, the horizontal alignment to centered, and the format to text. It also changes the value of Cell \texttt{A2} to 0.01, the horizontal alignment to left justified, and the format to the percentage with two decimal places.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Range vs Cells}\label{subsec:RangeVsCells}
+
+Now that we have covered the \blue{\texttt{With: End With}} statement, the function \texttt{Cells} can be introduced which can be used with the \texttt{Range} function to dynamically select Ranges.
+
+So far, we have been using the Range function in the same way each time -- to reference a single cell or a range of cells by using the corresponding Excel name for the Range (for example, \texttt{A1} or \texttt{A1:C3}). We can also define a Range by supplying two opposing corners to the Range function. For example, instead of writing \texttt{.Range("A1:C3")}, we could write \texttt{.Range(.Range("A1"), .Range("C3"))}. Note that we have again kept the leading full-stop as a reminder that full references are preferred.
+
+In fact, the following five expressions are equivalent:
+
+\begin{enumerate}
+    \item \texttt{.Range("A1:C3")}
+    \item \texttt{.Range(.Range("A1"), .Range("C3"))}
+    \item \texttt{.Range(.Range("C3"), .Range("A1"))}
+    \item \texttt{.Range(.Range("C1"), .Range("A3"))}
+    \item \texttt{.Range(.Range("A3"), .Range("C1"))}
+\end{enumerate}
+
+These have been included to emphasise that it does not matter in which order you supply the opposing corners -- either opposing corners given in either order works the same.
+
+The \texttt{Cells} function becomes more useful for referencing single cells as part of a subroutine, as it only needs numeric arguments. The most common way of using \texttt{Cells} is to write \texttt{.Cells(m, n)}, where \texttt{m} is the row number of the cell and \texttt{n} is the column number of the cell. For example, the code \texttt{.Cells(1, 2)} refers to cell \texttt{B1}, and \texttt{.Cells(2, 1)} refers to cell \texttt{A2}. When we combine this with the code for table dimensions (Section~\ref{subsec:FindingTableDimensions}), we can dynamically reference cells without having to convert cell references into text for the \texttt{Range} function.
+
+One of the other common ways of using the \texttt{Cells} function is to completely omit the arguments, which selects \textit{all} of the cells in the referenced worksheet. For example, the code below copies every cell in the \texttt{Sheet1} Worksheet, and pastes them into the \texttt{Sheet2} Worksheet:\\
+
+\begin{lstlisting}[style=A]
+    Sub SelectWholeWorksheet()
+
+        With Workbooks("Example Book.xlsm")
+            .Worksheets("Sheet1").Cells.Copy
+            .Worksheets("Sheet2").Cells.PasteSpecial xlPasteAll
+        End With
+
+    End Sub
+\end{lstlisting}
+
+We will see how to use this copy and paste method more in the following section.
+
+It is also worth mentioning another way of using the \texttt{Cells} function that is less common. Before we introduce it, we need to note that in the current latest version of Excel, there are \(16,384\) (\(2^{14}\)) columns and \(1,048,576\) (\(2^{20}\)) rows, so that there is a total of \(17,179,869,184\) (\(2^{34}\)) cells. These cells are numbered sequentially from left to right, and top to bottom. That is, cell \texttt{A1} is cell \(1\), cell \texttt{B1} is cell \(2\), cell \texttt{A2} is cell \(16,385\), and so on. With this in mind, we can use a single numeric argument in the \texttt{Cells} function to reference a cell. For example, the following three are equivalent:
+
+\begin{enumerate}
+    \item \texttt{.Cells(16386)}
+    \item \texttt{.Cells(2, 2)}
+    \item \texttt{.Range("B2")}
+\end{enumerate}
+
+The final thing to note is that we can combine the \texttt{Range} and the \texttt{Cells} function to select a range of cells like we did at the start of this section using multiple \texttt{Range} functions. This is typically the most versatile way of selecting a range of cells, as we can specify the opposing corner cells using the row and column numbers which are usually easier to work with than the cell addresses as text. This will become more apparent after reading through Sections~\ref{subsec:FindingTableDimensions} and \ref{subsec:CopyAndPasteExample}. For example, the following are all equivalent:
+
+\begin{enumerate}
+    \item \texttt{.Range("A1:C3")}
+    \item \texttt{.Range(.Range("A1"), .Range("C3"))}
+    \item \texttt{.Range(.Cells(1, 1), .Cells(3, 3))}
+    \item \texttt{.Range(.Cells(1, 1), .Range("C3"))}
+    \item \texttt{.Range(.Range("A1"), .Cells(3, 3))}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Additional Cells Usage}\label{subsec:ExtraCells}
+
+In fact, the \texttt{Cells} property belongs to a number of different objects, not just to Worksheets. For example, it also belongs as a property to the Range object, which means that we can write something like the following:\\
+
+\begin{lstlisting}[style=A]
+    Sub RangeDotCells()
+
+        With ThisWorkbook.Worksheets("Sheet1")
+            .Range("C3:E5").Cells(2, 2).Value = 1
+        End With
+
+    End Sub
+\end{lstlisting}
+
+Can you guess which cell will have its value changed? Try running this code to find out, noting that \texttt{ThisWorkbook} will always refer to the Workbook that the sub exists in.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COPYING AND PASTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Copying and Pasting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item Copy with the \texttt{.Copy} method, and paste using the \texttt{.PasteSpecial} method (with an option).
+    \item Clear the clipboard with \texttt{Application.CutCopyMode = \blue{False}}.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Copying and Pasting}
+
+Knowing how to copy and paste in VBA is a very useful part of VBA. This includes, but is not limited to, copying and pasting the following:
+
+\begin{enumerate}
+    \item SAS outputs into corresponding input Workbooks (note that we have to download the SAS outputs to an Excel Workbook first);
+    \item Monthly columns with formulas in summary tables, which can include diagonals of cells like in the delinquency tables;
+    \item Cell formats, which includes cell colours, font colours, border colours, number formats, and so on.
+\end{enumerate}
+
+For this section, we will restrict our attention to copy and pasting Ranges (a selection of cells, which may be just a single cell). There are two main ways to do this, one of which is analogous to pressing \texttt{Ctrl + C} and then \texttt{Ctrl + V}, and the other which has a lot more pasting options.
+
+The first way is to simply reference the Range that you want to copy, write the \texttt{.Copy} method, and then write the reference of the destination of the paste. If you are copying a Range that consists of more than a single cell, it is enough to write the top-left cell of the paste destination rather than write the entire Range that is being pasted to. The example below demonstrates how to copy and paste a single cell and a range of cells using this method:\\
+
+\begin{lstlisting}[style=A]
+    Sub CopyAndPaste()
+
+        With Workbooks("Example Book.xlsm").Worksheets("Sheet1")
+
+            '  Copy cell A1 into cell A2
+            .Range("A1").Copy .Range("A2")
+
+            '  Copy the Range A1:B2 into the Range C1:D2
+            .Range("A1:B2").Copy .Range("C1:D2")
+
+            '  The same as the above, but specifying the top-left cell in the paste destination
+            .Range("A1:B2").Copy .Range("C1")
+
+        End With
+
+    End Sub
+\end{lstlisting}
+
+The second method is very similar, but offers more flexibility. The copy part is the same, but instead of writing the paste destination on the same line, we write the paste destination on a new line (being on a new line is important) and use the \texttt{.PasteSpecial} method, followed by the pasting option that we want. For example, if we just want to paste the values, then we would follow \texttt{.PasteSpecial} with \texttt{xlPasteValues}.
+
+The example below shows how to perform the operations in the above example using this second method:\\
+
+\begin{lstlisting}[style=A]
+    Sub CopyAndPaste()
+
+        With Workbooks("Example Book.xlsm").Worksheets("Sheet1")
+
+            '  Copy cell A1 into cell A2
+            .Range("A1").Copy
+            .Range("A2").PasteSpecial xlPasteAll
+
+            '  Copy the Range A1:B2 into the Range C1:D2
+            .Range("A1:B2").Copy
+            .Range("C1:D2").PasteSpecial xlPasteAll
+
+            '  The same as the above, but specifying the top-left cell in the paste destination
+            .Range("A1:B2").Copy
+            .Range("C1").PasteSpecial xlPasteAll
+
+        End With
+
+    End Sub
+\end{lstlisting}
+
+Some of the more useful options for \texttt{PasteSpecial} are:
+
+\begin{enumerate}
+    \item \texttt{xlPasteAll}, which pastes everything;
+    \item \texttt{xlPasteFormats}, which pastes just the formatting of the cell;
+    \item \texttt{xlPasteFormulas}, which pastes just the formulas;
+    \item \texttt{xlPasteValues}, which pastes just the values;
+    \item \texttt{xlPasteValuesAndNumberFormats}, which pastes the values and the formats of the numbers.
+\end{enumerate}
+
+The list of all options can be found in \cite{xlPasteTypeEnumeration}.
+
+It is worth noting that it is usually a good idea to clear the clipboard whenever you copy and paste something (especially something large), otherwise you may get a warning that starts with \textit{There is a large amount of information on the Clipboard}. To do this, write the following on a new line immediately after pasting:
+\[
+\texttt{Application.CutCopyMode = \blue{False}}
+\]
+
+After getting more familiar with VBA, you will be able to write code that does not rely on the clipboard at all, so this step would not be necessary.
+
+For more on \texttt{Application.CutCopyMode = \blue{False}}, see \cite{ApplicationOnKey} and the answers in \cite{StackOverflowCutCopyMode}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Finding Table Dimensions}\label{subsec:FindingTableDimensions}
+
+In many cases, the sizes of tables are constantly changing. Because of this, it is important to know how to determine the size of the table, so that we can copy and paste a correct range, or so that we can add more data to a table correctly, or many other things.
+
+There are two particularly useful pieces of code that will help with this. They are:
+
+\begin{enumerate}
+    \item \texttt{.Cells(1, .Columns.Count).End(xlToLeft).Column}
+    \item \texttt{.Cells(.Rows.Count, 1).End(xlUp).Row}
+\end{enumerate}
+
+Note that both are assumed to be within a \texttt{\blue{With}} statement, and used as properties of a Worksheet.
+
+The first piece of code returns the \textit{column number} that corresponds to the first non-empty cell on row 1, from the right. This is analogous to going to the right-most cell in the first row, then pressing \texttt{Ctrl} and the left arrow, and making a note of the column number. By changing the \texttt{1} in the first argument of the \texttt{Cells} function to a different positive whole number, say \texttt{n}, the code will return the column number of the first non-empty cell on row \texttt{n} from the right.
+
+The second piece of code works the same as the first, but returns the \textit{row number} and is analogous to going to the bottom cell in the first column, then pressing \texttt{Ctrl} and the up arrow, and making a note of the row number. Similarly, by changing the \texttt{1} in the second argument of the \texttt{Cells} function to a different positive whole number, say \texttt{n}, the code will return the row number of the first non-empty cell on column \texttt{n} from the bottom.
+
+For example, consider a table that occupies every cell within the range \texttt{A1:C10}. The following code will determine the column number of the first non-empty cell on row \texttt{1} (from the right), the row number of the first non-empty cell on column \texttt{1} (from the bottom), and then prints a message box with the text \textit{The table consists of 3 columns and 10 rows}.\\
+
+\begin{lstlisting}[style=A]
+    Option Explicit
+
+    Sub TableDimensions()
+
+        Dim colNum As Long, rowNum As Long
+
+        With Workbooks("Example Book.xlsm").Worksheets("Sheet1")
+            colNum = .Cells(1, .Columns.Count).End(xlToLeft).Column
+            rowNum = .Cells(.Rows.Count, 1).End(xlUp).Row
+        End With
+
+        MsgBox "The table consists of " & colNum & " columns and " & rowNum & " rows."
+
+    End Sub
+\end{lstlisting}
+
+Of course, the code above assumes that the table is rectangular for the message box to be correct, and the code would have to be tweaked if the top-left cell of the table was not \texttt{A1}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MANIPULATING WORKBOOKS AND WORKSHEETS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Manipulating Workbooks and Worksheets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item Open and close Workbooks with the \texttt{.Open} and \texttt{.Close} methods.
+    \item Add Workbooks and Worksheets with the \texttt{.Add} method.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Opening Workbooks}
+
+By supplying the file path of a Workbook, we are able to open the Workbook as part of a subroutine. There are also a number of options that can be used to control some aspects of how the Workbook is opened (see \cite{WorkbooksOpen}).
+
+Suppose that the file path for a Workbook is \texttt{C:\textbackslash Documents\textbackslash Book1.xlsx}. The subroutine below opens this Workbook.\\
+
+\begin{lstlisting}[style=A]
+    Sub OpenWorkbook()
+
+        Workbooks.Open Filename:="C:\Documents\Book1.xlsx"
+
+    End Sub
+\end{lstlisting}
+
+When the Workbook is already open, this does nothing and does not produce an error. If we wanted to open this Workbook as Read-Only, then we use the \texttt{ReadOnly:=True} option.\\
+
+\begin{lstlisting}[style=A]
+    Sub OpenWorkbookReadOnly()
+
+        Workbooks.Open Filename:="C:\Documents\Book1.xlsx", ReadOnly:=True
+
+    End Sub
+\end{lstlisting}
+
+It is important to note that the options use the combination of a colon and equals sign (\texttt{:=}) when giving them a value. If just an equals sign (\texttt{=}) is used, then the options are likely to not function as intended.
+
+We saw in Section~\ref{subsec:DeclaringVariables} how to assign a Workbook to a variable. We can use a combination of these codes to open a Workbook and simultaneously assign it to a variable to make it easier to work with -- see the example below, which opens the Workbook \texttt{Book1.xlsx} and assigns it to the variable \texttt{mainBook}, and then changes the value of Cell 1 in the \texttt{Sheet1} Worksheet to \textit{Test}.\\
+
+\begin{lstlisting}[style=A]
+    Sub WorkbookOpener()
+
+        Dim mainBook As Workbook
+        Set mainBook = Workbooks.Open(Filename:="C:\Documents\Book1.xlsx")
+        mainBook.Worksheets("Sheet1").Range("A1").Value = "Test"
+
+    End Sub
+\end{lstlisting}
+
+Note that there is a slight syntactic difference in this example -- the parentheses have been included around the \texttt{Filename} argument. This is important: usually, the parentheses are \textit{excluded} when a function is run without the output being assigned to anything like in the \texttt{OpenWorkbook} subroutine, and the parentheses are \textit{included} when the output of a function is assigned to something.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Closing Workbooks}
+
+Closing a Workbook is even easier than opening it -- all you need to write is a \texttt{.Close} after the Workbook. The example below closes the Workbook \texttt{Book1.xlsx} explicitly, and also by using the variable that the Workbook is assigned to.\\
+
+\begin{lstlisting}[style=A]
+    Sub WorkbookCloser()
+
+        Workbooks("Book1.xlsx").Close
+
+    End Sub
+
+    Sub SecondWorkbookCloser()
+
+        Dim mainBook As Workbook
+        Set mainBook = Workbooks("Book1.xlsx")
+        mainBook.Close
+
+    End Sub
+\end{lstlisting}
+
+It is important to note that the \texttt{.Close} method will \textit{only} work if the Workbook is open. If you try to close a Workbook that is not open (or that doesn't exist, either), you will get the error \red{``Run-time error \apos9\apos: Subscript out of range''}.
+
+A particularly useful closing option is the \texttt{SaveChanges} option. By specifying \texttt{True}, any changes made to the Workbook will be saved when the Workbook is closed. An example of how to use this option is given below.\\
+
+\begin{lstlisting}[style=A]
+    Sub WorkbookCloser()
+
+        Workbooks("Book1.xlsx").Close SaveChanges:=True
+
+    End Sub
+\end{lstlisting}
+
+Note the use of the colon with the equals rather than just an equals. More closing options can be found in \cite{WorkbooksClose}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Making a New Workbook}
+
+There are two main ways to make a new Workbook. The first is using the \texttt{Workbooks.Add} method, which is analogous to opening a fresh Excel manually; the second is an option when copying a Worksheet from an open Workbook.
+
+The code below is an example of the first method which opens a new blank Excel Workbook when run.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddWorkbook()
+
+        Workbooks.Add
+
+    End Sub
+\end{lstlisting}
+
+It is usually convenient to assign the new Workbook to a variable so that you can use it immediately. The example below creates a new Workbook and assigns it the the variable \texttt{newBook}. Try to figure out what the rest of the code is doing -- it should be fairly intuitive.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddWorkbook()
+
+        Dim newBook As Workbook
+        Set newBook = Workbooks.Add
+
+        With newBook
+
+            With .Worksheets("Sheet1")
+
+                .Name = "Summary Sheet"
+                .Tab.Color = RGB(146, 208, 80)  'Light Green
+
+                With .Range("A1")
+
+                    .Value = Now
+                    .NumberFormat = "dd/mm/yyyy"
+
+                End With
+
+            End With
+
+            .SaveAs Filename:="New Book.xlsx"
+            .Close
+
+        End With
+
+    End Sub
+\end{lstlisting}
+
+The second method just uses the \texttt{.Copy} method for a Worksheet that is currently open, without specifying where to copy the Worksheet to. When no destination is specified, the default action is to open a new book whose only sheet is the sheet just copied. The example below creates a copy of the sheet \texttt{Sheet1} in a new Workbook:\\
+
+\begin{lstlisting}[style=A]
+    Sub SheetCopier()
+
+        Workbooks("Example Book.xlsx").Worksheets("Sheet1").Copy
+
+    End Sub
+\end{lstlisting}
+
+The name of the newly created Workbook will be \texttt{BookN.xlsx}, with \texttt{N} replaced by a number corresponding to however many new Workbooks have already been opened during the session. This has the disadvantage of making it more difficult to work with the newly created Workbook.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{New Worksheets and Position}
+
+We can create new sheets using the \texttt{Worksheets.Add} method. The example below creates a new sheet after the active sheet in the Workbook \texttt{Book1.xlsx}. The code is analogous to clicking the plus button at the bottom of the Workbook to add a new sheet.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddWorksheet()
+
+        Workbooks("Book1.xlsx").Worksheets.Add
+
+    End Sub
+\end{lstlisting}
+
+You can specify where in the order of Worksheets you would like the new sheet to be created. For example, we can create the new Worksheet before or after the Worksheet \texttt{ExampleSheet} by writing the code below.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddWorksheet()
+
+        With Workbooks("Book1.xlsx")
+
+            '  Add sheet before
+            .Worksheets.Add Before:=Worksheets("ExampleSheet")
+
+            '  Add sheet after
+            .Worksheets.Add After:=Worksheets("ExampleSheet")
+
+        End With
+
+    End Sub
+\end{lstlisting}
+
+There are two things to note: firstly, we do not need to specify which Workbook the \texttt{ExampleSheet} Worksheet is contained in, as we have already specified that we are adding the worksheet to the Workbook \texttt{Book1.xlsx}; secondly, it is important that there are no parentheses surrounding the \texttt{.Add} arguments in this particular example, as this would produce an error. We will require the parentheses in the next example.
+
+We can give the new Worksheet a name in the same step by accessing the \texttt{.Name} property of the Worksheet. In this example, the parentheses are important.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddWorksheet()
+
+        With Workbooks("Book1.xlsx")
+
+            '  Add sheet before
+            .Worksheets.Add(Before:=Worksheets("Example Sheet")).Name = "BeforeSheet"
+
+            '  Add sheet after
+            .Worksheets.Add(After:=Worksheets("Example Sheet")).Name = "AfterSheet"
+
+        End With
+
+    End Sub
+\end{lstlisting}
+
+More information on adding sheets can be found in \cite{WorksheetsAdd}. We can access other properties of the sheet when we first add it, like the colour of the tab. The code below adds a new Worksheet called \texttt{New Sheet}, and also makes the tab colour for the Worksheet green.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddWorksheetWithColour()
+
+        With Workbooks("Book1.xlsx").Worksheets.Add
+            .Name = "New Sheet"
+            .Tab.Color = RGB(146, 208, 80)
+        End With
+
+    End Sub
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \subsection{Manipulating Worksheet Contents}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Copy and Paste Example}\label{subsec:CopyAndPasteExample}
+
+This section is an example that utilises a few of the concepts above.
+
+For this example, we will assume that we have some raw data in a Workbook that we need to copy and paste into a different Workbook, and that we need to paste the raw data underneath the raw data that is already there. We will assume that both Workbooks have only three columns, and that the tables both start at \texttt{A1} in the Workbooks. Try to determine what each step of the example is doing.\\
+
+\begin{lstlisting}[style=A]
+    Sub TableCopierExample()
+
+        '  Set up the dimensions
+        Dim srceBook As Workbook
+        Dim destBook As Workbook
+        Dim srceRows As Long
+        Dim destRows As Long
+
+        '  Open the Workbooks
+        Workbooks.Open Filename:="C:\Documents\Destination Book.xlsx"
+        Workbooks.Open Filename:="C:\Documents\Source Book.xlsx", ReadOnly:=True
+
+        '  Set up the Workbook variables
+        Set destBook = Workbooks("Destination Book.xlsx")
+        Set srceBook = Workbooks("Source Book.xlsx")
+
+        '  Copy the raw data
+        With srceBook.Worksheets("Sheet1")
+            srceRows = .Cells(.Rows.Count, 1).End(xlUp).Row
+            .Range(.Cells(2, 1), .Cells(srceRows, 3)).Copy
+        End With
+
+        '  Paste into the destination Workbook
+        With destBook.Worksheets("Sheet1")
+            destRows = .Cells(.Rows.Count, 1).End(xlUp).Row
+            .Cells(destRows + 1, 1).PasteSpecial xlPasteValues
+        End With
+
+        '  Clear the clipboard
+        Application.CutCopyMode = False
+
+        '  Save and close the Workbooks
+        destBook.Close SaveChanges:=True
+        srceBook.Close
+
+    End Sub
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% OBJECTS, PROPERTIES, METHODS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Objects, Properties, and Methods}
+
+In this paper so far, we have made reference to \textit{properties} and to \textit{methods} without defining them explicitly. This section will explain what these are in some detail, as having an understanding of how these work will improve your ability to use them. However, this section may be skipped without any detriment to the understanding of the remaining sections.
+
+There are a number of resources available that explain these concepts (and others): the pages \cite{VBAMethods}, \cite{ExplainOOPTo6YO}, and \cite{UnderstandingOPM} are three such examples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item A \textit{property} of an object is exactly that -- it can be something as simple as the colour of the object.
+    \item A \textit{method} is any kind of action that can be performed, either with the object or on the object.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Objects}
+
+To understand properties and methods, you need to know what an object is. We briefly mentioned in Section~\ref{subsec:DataTypesAndObjects} that VBA is an Object Oriented programming language and we gave three examples of objects, namely Workbooks, Worksheets, and Ranges.
+
+% To avoid bringing in too many technical details, the following description will be somewhat imprecise but will be satisfactory for our usage.
+
+If we consider how a computer program usually works, there are a collection of variables which are related and manipulated using functions. In an Object Oriented language, some predefined variables and functions are bundled together to create an \textit{object} -- the variables that make up the object are its properties, and the functions are its methods.
+
+For example, a cell in a Worksheet is an object (specifically, a single cell is still a Range object). Some examples of its properties are:
+
+\begin{enumerate}
+    \item \texttt{Address} (such as \texttt{A1});
+    \item \texttt{Value} (either text or numeric);
+    \item \texttt{NumberFormat} (which is just the format of the cell value);
+    \item \texttt{HorizontalAlignment} (left justified, center, right justified);
+    \item \texttt{Formula} (such as \texttt{=SUM(A1:B2)}, which would also change the \texttt{Value}).
+\end{enumerate}
+
+Some examples of its methods are:
+
+\begin{enumerate}
+    \item \texttt{Copy} (which copies a selection of the properties);
+    \item \texttt{PasteSpecial} (which we have already seen);
+    \item \texttt{ClearContents} (clears formulas and values);
+    \item \texttt{AddComment} (adds text as a comment to the cell).
+\end{enumerate}
+
+The full list of all properties and methods for Range objects can be found in \cite{CellsPropsAndMethods}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Properties and Methods}
+
+Given an object, the easiest way to determine the value of one of its properties is to use the \texttt{Debug.Print} function and display the property itself. For example, we may write the following:\\
+
+\begin{lstlisting}[style=A]
+    Sub DisplayProperty()
+
+        Debug.Print Workbooks("Example Book.xlsm").Worksheets("Sheet1").Range("A1").Value
+
+    End Sub
+\end{lstlisting}
+
+In this case, the object is referenced by writing
+\[
+\texttt{Workbooks(\mauve{"Example Book.xlsm"}).Worksheets(\mauve{"Sheet1"}).Range(\mauve{"A1"})}
+\]
+and the property that has been called is the \texttt{Value} property. Supposing that we put the text \textit{This is cell A1} into the cell referenced above, the subroutine above would produce the text \textit{This is cell A1} in the Immediate Window.
+
+This can be particularly helpful for when you start using more variables in your code, particularly when you start to define cell references numerically using variables. For example, in the following piece of code we include the \texttt{Debug.Print} function at the bottom to check the address of the cell defined by the variables.\\
+
+\begin{lstlisting}[style=A]
+    Sub VariableCellReference()
+
+        Dim rowNum As Long, colNum As Long
+        Dim newCell As Range
+
+        rowNum = 2
+        colNum = (2 * rowNum) + 3
+
+        Set newCell = ThisWorkbook.Worksheets("Sheet1").Cells(rowNum, colNum)
+
+        Debug.Print newCell.Address
+
+    End Sub
+\end{lstlisting}
+
+Here, we have utilised the \texttt{Address} property of the cell. When we run this code, we get the message \textit{\$G\$2} in the Immediate Window.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ERROR HANDLING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Error Handling}
+
+In most cases, getting a error in your code is an indication that something is not working as expected. Thus, the usual error handling behaviour is to stop the code and display the error as soon as one has been triggered. However, there are some cases where it is beneficial to have more control over what happens when an error has been triggered.
+
+For more on error handling, visit the pages \cite{ErrorHandlingGuide} and \cite{OnErrorStatement}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Error Handling Options}
+
+The error handling options are set by first writing \blue{\texttt{On Error}}, and then the error handling option which is any of the options (descriptions taken from \cite{ErrorHandlingGuide}) listed in Table~\ref{tab:ErrorHandlingOptions}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \textbf{Option} & \textbf{Description} \\\hline
+        \texttt{\blue{Goto 0}} & When error occurs, the code stops and displays the error\\
+        \texttt{\blue{Goto -1}} & Clears the current error setting and reverts to the default\\
+        \texttt{\blue{Resume Next}} & Ignores the error and continues on\\
+        \texttt{\blue{Goto [Label]}} & Goes to a specific label when an error occurs
+    \end{tabular}
+    \caption{Error Handling Options}
+    \label{tab:ErrorHandlingOptions}
+\end{table}
+
+Note that \texttt{\blue{[Label]}} is replaced by the label that you wish to use.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Error Handling Example}
+
+One example of where control over error handing is beneficial is when you want to ungroup a column by writing \texttt{Columns(1).Ungroup} as part of a usual process. Consider this in the following code:\\
+
+\begin{lstlisting}[style=A]
+    Sub UngroupColumn()
+
+        Columns(1).Ungroup
+
+    End Sub
+\end{lstlisting}
+
+This will work fine when column \texttt{1} is grouped, and will ungroup the column as expected. However, if column \texttt{1} has been ungrouped at some point (manually or otherwise) before the \texttt{UngroupColumn} subroutine runs, an error will be generated by this \texttt{Ungroup} method and will cause the code to stop running.
+
+One way to work around this could be to write an if-statement to check whether column \texttt{1} is ungrouped or not, and to only attempt to ungroup it if it is still grouped. An alternative method is to change the error handling options so that if an error is generated, we ignore the error and continue running the code:\\
+
+\begin{lstlisting}[style=A]
+    Sub UngroupColumn()
+
+        On Error Resume Next
+            Columns(1).Ungroup
+        On Error Goto 0
+
+    End Sub
+\end{lstlisting}
+
+When the subroutine above is run, column \texttt{1} will be ungrouped if it is grouped, or nothing will happen (with no error) if it is already ungrouped. Since we only want to ignore errors for the \texttt{Ungroup} method, we have to set the error handling back to its default by writing the \texttt{\blue{On Error Goto} 0} line.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ASSIGN KEYS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Assign Keys}
+
+It is possible to assign subroutines to keys so that we can exploit custom keyboard shortcuts by using the \texttt{Application.OnKey} method. The exact syntax required to define the key combination is very specific, so if you intend to assign your own keys, you should read \cite{ApplicationOnKey}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Assign Keys Example}
+
+Suppose that we want to write a subroutine that adds 1 to the current selection when we press \texttt{Alt} and the up key. We do this in two parts: firstly, we need to write the subroutine that adds one to the selection; secondly, we then need to assign this subroutine to the key combination \texttt{Alt} and up.
+
+We can achieve the first part by writing the following subroutine \cite{PlusOneToSelection}:\\
+
+\begin{lstlisting}[style=A]
+    Sub PlusOneToSelection()
+
+        Dim r As Range, c As Range
+        Set r = Selection
+
+        For Each c In r
+            c.Value = c.Value + 1
+        Next
+
+    End Sub
+\end{lstlisting}
+
+This is then assigned to the key combination \texttt{Alt} and up by writing the following subroutine:\\
+
+\begin{lstlisting}[style=A]
+    Sub AssignKeys()
+
+        Application.OnKey "%{UP}", "PlusOneToSelection"
+
+    End Sub
+\end{lstlisting}
+
+Once this \texttt{AssignKeys} subroutine has been run, pressing the keys \texttt{Alt} and up will add 1 to the current selection as desired. It should be noted that this shortcut will work across all open instances of Excel, and that when all instances of Excel have been closed, this assignment will be reset. This means that the \texttt{AssignKeys} subroutine will have to be run again to assign the \texttt{PlusOneToSelection} subroutine to the key combination \texttt{Alt} and up any time that Excel is opened fresh.
+
+If you want this assignment to be run every time you open the workbook with the above subroutines in, you can write a subroutine which runs as soon as the workbook it is written in is opened. To do this, we have to use a specific name for the subroutine, which is \texttt{Auto\_Open} (there is also \texttt{Workbook\_Open}, as well as \texttt{Workbook\_BeforeClose}, but we will not cover them in this paper).
+
+The following code will run whenever the Workbook is opened, which will run the \texttt{AssignKeys} subroutine, which will assign the \texttt{PlusOneToSelection} subroutine to the key combination \texttt{Alt} and up.\\
+
+\begin{lstlisting}[style=A]
+    Sub Auto_Open()
+
+        Call AssignKeys()
+
+    End Sub
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Functions}
+
+Another major advantage of using VBA is the ability to write your own functions. These have a very similar syntax to subroutines, but we need to make sure that we explicitly define what the output of the function should be.
+
+We also do not `run' functions, so we cannot assign them to keys or to buttons. Instead, we use custom functions exactly the same way that we would use the default functions, but with the added advantage that we can also use custom functions within subroutines (normal Excel functions cannot usually be used within subroutines).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Function Examples}
+
+Defining a function is just like defining a subroutine, except that the \blue{\texttt{Sub}} text is replaced by \blue{\texttt{Function}}, and the output of the function is defined by writing the name of the function, followed by an equals sign (=) and the desired output. It is also good to declare the data type that the output of the function will be after writing the function name. For example, the function defined below adds 1 to the number provided as an argument to the function:\\
+
+\begin{lstlisting}[style=A]
+    Function PLUSONE(value As Long) As Long
+
+        PLUSONE = value + 1
+
+    End Function
+\end{lstlisting}
+
+By utilising if-statements, you can conditionally assign function outputs depending on the conditions that you provide:\\
+
+\begin{lstlisting}[style=A]
+    Function IFZERO(value As Variant, value_if_zero As Variant) As Variant
+
+        If value = 0 Then
+
+            IFZERO = value_if_zero
+
+        Else
+
+            IFZERO = value
+
+        End If
+
+    End Function
+\end{lstlisting}
+
+The functions can get as complex as you like, and they can be used as soon as they are written. It should be noted that custom functions are \textit{only} accessible from the Workbook that they are written in (unless you save them into an Add-In, but that is not covered in this resource).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% OUTLOOK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Outlook}
+
+It is possible to control the Outlook application using VBA code. Actually, Outlook has its own VBA editor which we can utilise, but this paper will only cover controlling Outlook from within Excel's VBA editor.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Setting Up The Reference}
+
+In the previous sections, we have declared variables as a number of different types of objects such as Range, Worksheet, and Workbook. These object classes are available by default, but there are numerous object classes available that need to be added before they can be used. To add object classes, we need to enable the corresponding \textbf{Reference}.
+
+To open the list of available references, open the VBA window, then click the \textbf{\underline{T}ools} tab followed by \textbf{\underline{R}eferences...}. This will open a new window with a long list of all of the available references.
+
+The Outlook reference that we need to enable to make the Outlook object classes available is \textbf{Microsoft Outlook 16.0 Object Library}. Check the tickbox next to this reference and then click \textbf{OK} to enable the reference.
+
+
+\subsubsection{Programmatically Add Outlook Reference}
+
+Adding this reference can be done programmatically, rather than checking the reference manually. To do this, we can write the code below.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddReferenceGUID()
+
+        ' Outlook Reference
+        ThisWorkbook.VBProject.References.AddFromGuid _
+            GUID:="{00062FFF-0000-0000-C000-000000000046}", _
+            Major:=0, _
+            Minor:=0
+
+    End Sub
+\end{lstlisting}
+
+The GUID supplied is the GUID corresponding to the \textbf{Microsoft Outlook 16.0 Object Library} reference. To get the GUID for all enabled references, we can write the code below.\\
+
+\begin{lstlisting}[style=A]
+    Sub GetReferenceGUID()
+
+        Dim i As Integer
+        For i = 1 To ThisWorkbook.VBProject.References.Count
+            With ThisWorkbook.VBProject.References(i)
+                Debug.Print .Name, .GUID, .Description, vbNewLine
+            End With
+        Next i
+
+    End Sub
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Writing Emails}\label{subsec:WritingEmails}
+
+With the Outlook reference set up, we have control over many aspects of the Outlook application. One of the most useful aspects is writing emails.
+
+To write an email, we need to use the \texttt{Outlook.Application} and \texttt{Outlook.MailItem} object classes. See the code below.\\
+
+\begin{lstlisting}[style=A]
+    Sub WriteNewEmail()
+
+        Dim OutlookApp  As New Outlook.Application
+        Dim OutlookMail As Outlook.MailItem
+        Set OutlookMail = OutlookApp.CreateItem(olMailItem)
+
+        With OutlookMail
+            .BodyFormat = olFormatHTML
+            .Display
+
+            .To = "john.doe@example.com; joe.bloggs@example.com"
+            .CC = "jane.doe@example.com"
+
+            .Subject = "Email from VBA"
+            .HTMLBody = "This is some text."
+        End With
+
+    End Sub
+\end{lstlisting}
+
+There are a few things going on here, but we'll only focus on the OutlookMail part. It is important to include the \texttt{Display} property at the start as this displays the email (so that we can see it). However, the \texttt{BodyFormat} property can be omitted if you want.
+
+The \texttt{To} and \texttt{CC} properties should be easy to understand -- just remember to delimit separate email addresses with a semicolon. Similarly, the \texttt{Subject} property should also be easy to understand. Finally, the \texttt{HTMLBody} property corresponds to the content of the email -- this is where the body of the email can be written.
+
+The \texttt{HTMLBody} property actually comes with a non-trivial default value, namely your email signature. Thus, it is usually preferable to define the \texttt{HTMLBody} property with itself concatenated onto the end, as in the code below.\\
+
+\begin{lstlisting}[style=A]
+    .HTMLBody = "This is some text." & HTMLBody
+\end{lstlisting}
+
+There is one drawback to using the \texttt{HTMLBody} property in this way: it will cause Outlook to generate a security prompt when this code is run, and this is currently unavoidable (it's a countermeasure against malicious code).
+
+The properties (\texttt{To}, \texttt{CC}, \texttt{Subject}, and \texttt{HTMLBody}) can all be set up manually, or by linking them to calculated fields in, say, the corresponding workbook -- that's up to you. Once you've set up how your email will be constructed, you may wish to link the subroutine to a button (Section~\ref{subsec:AssigningAButton}) or find some other way to run it easily. The steps to send the email will be to run the subroutine however is convenient for you, allow the VBA to run in the security prompt, double check that the email has been created correctly, and then click the send button.
+
+It should be noted that there is a \texttt{.Send} method that you can put inside the end of the \texttt{\blue{With} OutlookMail} statement, but this will also always generate the security prompt. More importantly, including this method will not allow you to give the email a quick look over, so you may accidentally email out a nonsensical email if something went wrong in the code.
+
+
+\subsubsection{Additional Control: Attaching Documents, Voting}
+
+Two more useful properties that we can use when writing emails are \texttt{.Attachments} and \texttt{.VotingOptions}, which allow the manipulation of files attached to the email and the inclusion of voting options, respectively.
+
+To add an attachment to a file, we need to use the \texttt{.Add} method of the \texttt{.Attachments} property and supply the full file path for the file to attach to the \texttt{Source} argument. An example of how this might look is below.\\
+
+\begin{lstlisting}[style=A]
+    .Attachments.Add Source:="C:\Documents\Test.xlsx"
+\end{lstlisting}
+
+To add voting buttons to the email, we need to use the \texttt{VotingOptions} property. The voting options are input the same as they would be if you were to add them in the email itself -- each of the items should be listed on the same line, and delimited by semicolons. An example of how this might look is below.\\
+
+\begin{lstlisting}[style=A]
+    .VotingOptions = "Option 1;Option 2;Option 3"
+\end{lstlisting}
+
+There are loads of other properties that can be utilised -- these are just two that I've personally used fairly frequently.
+
+% \subsubsection{Adding Tables}
+
+
+% \subsubsection{Adding Images}
+
+
+\subsubsection{Writing HTML}
+
+The start of this section showed that the body of the email can be defined in the \texttt{HTMLBody} property. This property, as the name suggests, allows the body to be supplied in a HTML format so that we can add colour, change font size and type, add rich text, add line breaks, and so on to the body of the email. This guide isn't a HTML guide, so we'll only supply some basic HTML and describe how to see the HTML of an email.
+
+It's important to understand that the majority of the HTML elements (code of the form \texttt{<b></b>}) need to be closed after they're opened, much like a do loop needs and end statement, or a \texttt{\blue{Sub}} statement must end with an \texttt{\blue{End Sub}} statement. An HTML element opens with the angle brackets and the element tag, say \texttt{<b>}, and closes with the angle brackets and the same element with a slash before the element tag, like \texttt{</b>}. In Table~\ref{tab:BasicHTML}, the \texttt{...} is to be replaced by whatever you want to contain within the element.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l|l}
+        Outcome          & HTML\\\hline
+        Line Break       & \texttt{<br>}\\
+        Bold             & \texttt{<b>...</b>}\\
+        Italic           & \texttt{<i>...</i>}\\
+        Underlined       & \texttt{<u>...</u>}\\
+        Font Size (14pt) & \texttt{<span style='font-size:14pt'>...</span>}\\
+    \end{tabular}
+    \caption{Basic HTML}
+    \label{tab:BasicHTML}
+\end{table}
+
+The following code example shows how these would be used in the body of an email -- try running this code to see the email that is created.\\
+
+\begin{lstlisting}[style=A]
+    Sub AddingRichText()
+
+        Dim OutlookApp  As New Outlook.Application
+        Dim OutlookMail As Outlook.MailItem
+        Set OutlookMail = OutlookApp.CreateItem(olMailItem)
+
+        With OutlookMail
+            .BodyFormat = olFormatHTML
+            .Display
+
+            .HTMLBody = "" _
+                & "<b>Bold</b>" & "<br><br>" _
+                & "<i>Italic</i>" & "<br><br>" _
+                & "<u>Underlined</u>" & "<br><br>" _
+                & "<span style='font-size:14pt'>Large</span>" & "<br><br>" _
+                & "<span style='font-size:9pt'>Small</span>" & "<br><br>"
+        End With
+
+    End Sub
+\end{lstlisting}
+
+To see the underlying HTML of an email that you've received, open the email in a new window (pop-out or double click). In the \textbf{Message} tab, there is an \textbf{Actions} drop-down box in the \textbf{Move} section. Click this, then \textbf{Other Actions}, and then \textbf{View Source}. The window that opens is the underlying HTML for the email. This will usually come with a lot of MS `junk', but the body content of the email will be right at the very bottom in the \texttt{<body>} element (there will still be a lot of `junk' to sort through, but it can be a good starting place to figure out the HTML that you need to format a particular piece of text).
+
+
+% \subsubsection{Working Example}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% APPENDIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+
+\section*{Appendix}
+\addcontentsline{toc}{section}{Appendix}
+
+\subsection*{Useful Characters}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l|l}
+        Character & Effect \\\hline
+        Apostrophe (\texttt{'})  & Comments out the remainder of the line \\
+        Colon (\texttt{:})       & Allows multiple statements to be written on one line \\
+        Underscore (\texttt{\_}) & Used to break a line onto a new line \\
+    \end{tabular}
+    \caption{Useful Characters}
+    \label{tab:useful_chars}
+\end{table}
+
+\subsection*{Useful Subroutine Code}
+
+\begin{lstlisting}[style=A]
+    Sub ExampleSub()
+
+        '  Speeds up processing
+        With Application
+            .EnableEvents = False
+            .ScreenUpdating = False
+        End With
+
+        '  To refresh PivotTables
+        Workbooks("Book With PivotTables.xlsx").RefreshAll
+
+    End Sub
+\end{lstlisting}
+
+\clearpage
+\bibliographystyle{plain}\bibliography{biblio}
+
+\end{document}

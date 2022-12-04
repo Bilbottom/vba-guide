@@ -1,0 +1,88 @@
+%----------Useful Packages----------%
+
+\RequirePackage{marvosym,fontspec,titlesec,charter,enumitem}
+\RequirePackage{xcolor,graphicx,listings}
+\usepackage[margin=0.8in]{geometry}
+
+%----------Page Setup----------%
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{.5\baselineskip plus 1pt minus 1pt}
+
+\setlength{\headheight}{0pt}
+
+%----------Fonts----------%
+
+\defaultfontfeatures{Mapping=tex-text}
+\setmainfont[
+Path = D:/Repository/Life/Employment/curriculum-vitae/tex/fonts/,
+SmallCapsFont = Fontin-SmallCaps.otf,
+BoldFont = Fontin-Bold.otf,
+ItalicFont = Fontin-Italic.otf
+]
+{Fontin.otf}
+
+%----------Title----------%
+
+\newcommand{\recipetitle}{
+    \vspace*{\baselineskip}
+    {\LARGE {\recipename} \hfill\normalsize\recipecreator}
+
+    \vspace{-\baselineskip}\hrulefill
+
+    \vspace{-0.5\baselineskip}{\footnotesize\version} \hfill {\footnotesize\versiondate}
+}
+
+%----------Commands----------%
+
+\RequirePackage{wasysym} %  https://tex.stackexchange.com/questions/85335/how-to-change-dot-spacing-in-dotfill
+
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\newcommand{\tick}{\dotfill\(\ocircle\)}
+\newcommand{\blue}[1]{\textcolor{blue!80!white}{#1}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green!70!black}{#1}}
+\newcommand{\yellow}[1]{\textcolor{yellow!70!black}{#1}}
+\newcommand{\mauve}[1]{\textcolor{mymauve}{#1}}
+\newcommand{\quant}[1]{\red{#1}\tick}
+
+\newcommand{\Google}{\blue{G}\red{o}\yellow{o}\blue{g}\green{l}\red{e}}
+\newcommand{\apos}{\(\!\)\texttt{'}\(\!\)}
+
+
+%--------------VBA Code Input--------------%
+
+%  https://tex.stackexchange.com/questions/22874/how-to-typeset-vba-code-in-latex
+
+
+\lstset
+{
+    breaklines=true,
+    tabsize=3,
+    showstringspaces=false,
+    otherkeywords={Long, False}%{Workbook, Worksheet}
+}
+\lstdefinestyle{Common}
+{
+    extendedchars=\true,
+    language={[Visual]Basic},
+    frame=single,              % adds a frame around the code
+    %===========================================================
+    framesep=3pt,       % expand outward.
+    framerule=0.4pt,    % expand outward.
+    xleftmargin=3.4pt,  % make the frame fits in the text area.
+    xrightmargin=3.4pt, % make the frame fits in the text area.
+    %===========================================================
+    rulecolor=\color{gray}
+}
+\lstdefinestyle{A}
+{
+    style=Common,
+    backgroundcolor=\color{gray!10!white},
+    basicstyle=\scriptsize\color{black}\ttfamily,
+    keywordstyle=\color{blue},
+    identifierstyle=\color{black},
+    stringstyle=\color{mymauve},
+    commentstyle=\color{green!50!black}
+}
