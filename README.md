@@ -1,7 +1,9 @@
 VBA Guide
 ---
 
-Reference guide for Visual Basic for Applications (VBA).
+Reference guide for Visual Basic for Applications (VBA). The latest version of the file can be found in the [compiled](compiled) directory:
+
+- [vba-guide.pdf](compiled/vba-guide.pdf)
 
 The TeX fonts used come from:
 

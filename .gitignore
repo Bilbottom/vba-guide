@@ -5,9 +5,13 @@
 *.sqlite
 
 # TeX Files
+/tex/compiled/
 compiled/
 *.pdf
 *.otf
+
+!/tex/compiled/proofs.pdf
+!/compiled/vba-guide.pdf
 
 # Images
 *.png
@@ -18,10 +22,6 @@ compiled/
 
 # IDEA files
 .idea/
-
-# TeX files
-/tex/compiled/
-!/tex/compiled/proofs.pdf
 
 
 # Byte-compiled / optimized / DLL files
@@ -162,4 +162,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
