@@ -5,10 +5,12 @@
 *.sqlite
 
 # TeX Files
-/tex/compiled/
 compiled/
+/tex/compiled/
+/tex/fonts/
 *.pdf
 *.otf
+*.ttf
 
 !/tex/compiled/proofs.pdf
 !/compiled/vba-guide.pdf
